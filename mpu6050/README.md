@@ -108,3 +108,56 @@ void loop() {
 
 ```
 
+Now we need to actually read and print out the values
+
+Code:
+```cpp
+#include <Wire.h>
+
+#define MPU6050_ADDR 0x68
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin();
+}
+
+void loop() {
+  Wire.beginTransmission(MPU6050_ADDR);
+  Wire.write(0x3B);
+  byte error = Wire.endTransmission();
+
+  if (error != 0) Serial.println("Connection failed!");
+
+  Wire.requestFrom(MPU6050_ADDR, 6);
+
+  if(Wire.available() == 6){
+    byte accX_H = Wire.read();
+    byte accX_L = Wire.read();
+
+    byte accY_H = Wire.read();
+    byte accY_L = Wire.read();
+
+    byte accZ_H = Wire.read();
+    byte accZ_L = Wire.read();
+
+    Serial.print("X high:");
+    Serial.println(accX_H);
+    Serial.print("X low:");
+    Serial.println(accX_L);
+
+    Serial.print("Y high:");
+    Serial.println(accY_H);
+    Serial.print("Y low:");
+    Serial.println(accY_L);
+
+    Serial.print("Z high:");
+    Serial.println(accZ_H);
+    Serial.print("Z low:");
+    Serial.println(accZ_L);
+  }
+
+  delay(500);
+}
+
+```
+
