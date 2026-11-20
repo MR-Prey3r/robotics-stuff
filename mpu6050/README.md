@@ -8,7 +8,7 @@ Below are all the basic operations of the **MPU6050 (gyro+acceleration module)**
   - `requestFrom()` → Request data from the device.
 
 
-## Simple Wake-up probing
+## 1. Simple Wake-up probing
 Operation Steps:
   1. prepare the arduino for i2c comm with `Wire.begin()`
   2. init the transmission sequence with `Wire.beginTransmission()`
@@ -46,7 +46,7 @@ void loop() {
 }
 ```
 
-## Reading the values from registers
+## 2. Reading the values from registers
 In this step we'll read through the values from its registers.
 
 The process flows like below image:
@@ -54,11 +54,11 @@ The process flows like below image:
 
 Steps:
   1. Start an I²C transmission to MPU6050_ADDR.
-  2. Select the starting register `0x3B` using `Wire.write()`
+  2. Select the starting register (i.e.`0x3B`) using `Wire.write()`
   3. End the transmission.
   4. Request 6 bytes from the MPU6050 using `Wire.requestFrom()`
 
-These are the **6 consecutive bytes** of Accelerometer we're gonna read first:
+These are the **6 consecutive bytes** of MPU6050's Accelerometer:
 | Register address | Register name | What it stores |
 | :--- | :--- | :--- |
 | `0x3B` | ACCEL_XOUT_H | Accelerometer X high byte |
@@ -68,16 +68,19 @@ These are the **6 consecutive bytes** of Accelerometer we're gonna read first:
 | `0x3F` | ACCEL_ZOUT_H | Accelerometer Z high byte |
 | `0x40` | ACCEL_ZOUT_L | Accelerometer Z low byte |
 
-Simpler visual:
-| Axis | High byte | Low byte |
+And **6 consecutive bytes** of MPU6050's Gyroscope:
+| Register address | Register name | What it stores |
 | :--- | :--- | :--- |
-| X | `0x3B` | `0x3C` |
-| Y | `0x3D` | `0x3E` |
-| Z | `0x3F` | `0x40` |
+| `0x43` | GYRO_XOUT_H | Gyroscope X high byte |
+| `0x44` | GYRO_XOUT_L | Gyroscope X low byte |
+| `0x45` | GYRO_YOUT_H | Gyroscope Y high byte |
+| `0x46` | GYRO_YOUT_L | Gyroscope Y low byte |
+| `0x47` | GYRO_ZOUT_H | Gyroscope Z high byte |
+| `0x48` | GYRO_ZOUT_L | Gyroscope Z low byte |
 
-So we want to read the 6 consecutive bytes via `.requestFrom()` starting from `0x3B`
+__To read the data we need to read the 6 consecutive bytes via `.requestFrom()` starting from `0x3B` in case of Accelerometer & `0x43` for Gyro__
 
-Code:
+Code for accelerometer:
 ```cpp
 #include <Wire.h>
 
@@ -91,14 +94,14 @@ void setup() {
 
 void loop() {
   Wire.beginTransmission(MPU6050_ADDR);
-  Wire.write(0x3B); // we're gonna read 6 consecutive bytes stating from mpu's `0x3B` (`0x3B` to `0x40`)
+  Wire.write(0x3B); // setting the stating byte point to read (`0x3B` to `0x40`)
   byte error = Wire.endTransmission();
 
   if(error != 0) Serial.println("Connection failed!");
 
   Wire.requestFrom(MPU6050_ADDR, 6); // requesting to read all 6 consecutive bytes starting from the initial `0x3B` we set above
 
-  if(Wire.available() == 6) Serial.println("Received all 6 bytes!"); // checks if we actually have the all the 6 bytes available on i2c buffer
+  if(Wire.available() == 6) Serial.println("Received all 6 bytes!"); // checks if we actually have the all the 6 bytes data available, on i2c buffer
 
   delay(1000);
 }
