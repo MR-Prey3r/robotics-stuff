@@ -101,7 +101,7 @@ void loop() {
 
   Wire.requestFrom(MPU6050_ADDR, 6); // requesting to read all 6 consecutive bytes starting from the initial `0x3B` we set above
 
-  if(Wire.available() == 6) Serial.println("Received all 6 bytes!"); // checks if we actually have the all the 6 bytes data available, on i2c buffer
+  if(Wire.available() == 6) Serial.println("Received all 6 bytes!"); // checks if we have the all the 6 bytes data(unread) available, on i2c buffer
 
   delay(1000);
 }
